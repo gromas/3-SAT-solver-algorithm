@@ -18,4 +18,4 @@
 
 Удачи, R5FO
 
-Ссылка на обсуждение в telegram: https://t.me/hamrecipe/35?comment=165
+
