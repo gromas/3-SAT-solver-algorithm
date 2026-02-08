@@ -102,3 +102,6 @@ The most critical part of the proof is **Lemma 3**, specifically the claim about
 
 ---
 *This text is provided to facilitate clear scientific discourse. The ultimate validity of the claim depends on rigorous community review.*
+
+---
+This repository was prepared with the assistance of DeepSeek AI for code structuring, documentation, and proofreading.
