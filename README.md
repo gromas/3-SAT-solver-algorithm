@@ -1,10 +1,9 @@
-
 # pqsat algorithm
-## Structural Elimination for SAT
+### Structural Elimination for SAT
 
-### Author: [R.S.Golubin / gromas]
-### License: MIT
-### Status: Research / Proof of Concept
+#### Author: [R.S.Golubin / gromas]
+#### License: MIT
+#### Status: Research / Proof of Concept
 
 ## Overview
 
@@ -33,7 +32,7 @@ Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomiz
     For each variable x, we track two events:
     
     - t_in(x) — the step when the first clause containing x is added to the BDD.
-      - t_out(x) — the step when the last clause containing x is processed and x is eliminated.
+    - t_out(x) — the step when the last clause containing x is processed and x is eliminated.
     
     Between t_in and t_out, x is active — present in the current BDD context.
 
@@ -127,12 +126,13 @@ The result is in the BDD immediately after the last elimination.
 
 Comparison with Existing Algorithms
 
-Algorithm Type Complexity (3-SAT) Final Step
-Brute force deterministic 2^n Enumeration
-DPLL/CDCL deterministic 2^n worst-case Backtracking
-PQ-Algorithm deterministic 2^{n/2} worst-case None (BDD result)
-PPSZ (best det.) deterministic 2^{0.386n} (complex) Complex algebra
-Schöning randomized 2^{0.334n} Random walks
+|Algorithm |Type |Complexity (3-SAT) |   Final Step |
+| :--- | :---: | :---: |-------------:|
+|Brute force |deterministic |2^n |  Enumeration |
+|DPLL/CDCL |deterministic |2^n worst-case | Backtracking |
+|PQ-Algorithm |deterministic |2^{n/2} worst-case |None (BDD result)|
+|PPSZ (best det.) |deterministic |2^{0.386n} (complex) |Complex algebra|
+|Schöning |randomized |2^{0.334n} |Random walks|
 
 PQ-Algorithm is simpler than PPSZ, fully deterministic, and provides a guaranteed upper bound 2^{n/2} for any CNF — with no final enumeration.
 
