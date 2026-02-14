@@ -219,7 +219,7 @@ If you use this algorithm in your research, please cite:
   title = {PQ-Algorithm: Structural Elimination for SAT},
   year = {2026},
   publisher = {GitHub},
-  url = {https://github.com/gromas/3-SAT-solver-algorithm}
+  url = {https://github.com/gromas/pqsat}
 }
 ```
 
