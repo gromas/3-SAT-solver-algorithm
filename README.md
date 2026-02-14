@@ -1,8 +1,10 @@
 
-PQ-Algorithm: Structural Elimination for SAT
+pqsat algorithm: Structural Elimination for SAT
 
 Author: [R.S.Golubin / gromas]
+
 License: MIT
+
 Status: Research / Proof of Concept
 
 ---
