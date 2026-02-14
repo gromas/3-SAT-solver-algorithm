@@ -58,8 +58,6 @@ Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomiz
     Total complexity:
     
     T(n) = O(n * 4^W_max)
-    
-    where m is the number of clauses.
 
 ---
 
