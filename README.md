@@ -1,15 +1,12 @@
 
-pqsat algorithm: Structural Elimination for SAT
+# pqsat algorithm
+## Structural Elimination for SAT
 
-Author: [R.S.Golubin / gromas]
+### Author: [R.S.Golubin / gromas]
+### License: MIT
+### Status: Research / Proof of Concept
 
-License: MIT
-
-Status: Research / Proof of Concept
-
----
-
-Overview
+## Overview
 
 PQ-Algorithm is a deterministic structural SAT solver based on dynamic context elimination using BDDs (Binary Decision Diagrams).
 
@@ -20,7 +17,7 @@ Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomiz
 - Provides predictable complexity before solving
 - Requires no final enumeration — result is in the BDD after the last clause
 
-Key properties:
+### Key properties:
 
 - Deterministic (no randomness, always correct)
 - Predictable time complexity: O(m \cdot 4^{W_{\max}})
@@ -29,7 +26,7 @@ Key properties:
 
 ---
 
-The Core Idea
+## The Core Idea
 
 1. Variable Lifetime Tracking
 
@@ -67,17 +64,17 @@ where m is the number of clauses.
 
 ---
 
-Why W_{\max} Matters
+## Why W_max Matters
 
-- If W_{\max} is small (e.g., \log n), the formula is structurally easy — solved in near-polynomial time.
-- If W_{\max} \approx n/2, the formula is in the phase transition region — hardest case, but still bounded by O(2^{n/2}).
-- If W_{\max} is large (> n/2), the formula may be exponentially hard for any algorithm.
+- If W_max is small (e.g., log(n)), the formula is structurally easy — solved in near-polynomial time.
+- If W_max approx n/2, the formula is in the phase transition region — hardest case, but still bounded by O(2^{n/2}).
+- If W_max is large (> n/2), the formula may be exponentially hard for any algorithm.
 
-Crucial: W_{\max} can be estimated before solving by analyzing the interaction graph and simulating a greedy clause order.
+Crucial: W_max can be estimated before solving by analyzing the interaction graph and simulating a greedy clause order.
 
 ---
 
-Algorithm (Conceptual)
+## Algorithm (Conceptual)
 
 ```
 1. Input: CNF formula F with n variables, m clauses.
@@ -105,7 +102,7 @@ The result is in the BDD immediately after the last elimination.
 
 ---
 
-Why It Works
+## Why It Works
 
 1. Immediate Garbage Collection
 
@@ -150,8 +147,8 @@ Before running the main algorithm, you can estimate W_{\max}:
 3. Simulate greedy clause order to estimate t_{\text{in}} and t_{\text{out}}.
 4. Compute approximate W_{\max}.
 
-If W_{\max} is small → problem is easy.
-If W_{\max} \approx n/2 → problem is in the phase transition zone, expect 2^{n/2} steps.
+If W_max is small → problem is easy.
+If W_max approx n/2 → problem is in the phase transition zone, expect 2^{n/2} steps.
 
 ---
 
@@ -168,8 +165,8 @@ Strengths
 
 Limitations
 
-- BDD size can blow up if W_{\max} is underestimated.
-- Optimal clause order estimation is heuristic; may not always achieve minimal W_{\max}.
+- BDD size can blow up if W_max is underestimated.
+- Optimal clause order estimation is heuristic; may not always achieve minimal W_max.
 - Currently analyzed for 3-CNF; longer clauses may require adjustments.
 - BDD implementation must support efficient existential quantification.
 
