@@ -35,10 +35,10 @@ The Core Idea
 
 For each variable x, we track two events:
 
-- t_{\text{in}}(x) — the step when the first clause containing x is added to the BDD.
-- t_{\text{out}}(x) — the step when the last clause containing x is processed and x is eliminated.
+- t_in(x) — the step when the first clause containing x is added to the BDD.
+- t_out(x) — the step when the last clause containing x is processed and x is eliminated.
 
-Between t_{\text{in}} and t_{\text{out}}, x is active — present in the current BDD context.
+Between t_in and t_out, x is active — present in the current BDD context.
 
 2. Context Size
 
@@ -122,7 +122,7 @@ At the end, it either reduces to True, False, or a small function — but no exp
 For random 3-SAT with clause/variable ratio ≈ 4.26, the interaction graph forces W_{\max} \approx n/2.
 Thus:
 
-T_{\text{worst}} = O(2^{n/2} \cdot \text{poly}(n))
+T_worst = O(2^{n/2} \cdot \text{poly}(n))
 
 This is better than naive 2^n and matches the best known deterministic bounds for general CNF.
 
