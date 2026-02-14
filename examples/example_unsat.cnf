@@ -1,6 +1,0 @@
-c Example unsatisfiable 3-SAT formula
-c (x1) ∧ (¬x1) encoded as 3-SAT with repeated literals
-p cnf 1 2
-1 1 1 0
--1 -1 -1 0
-0

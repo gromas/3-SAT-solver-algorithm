@@ -20,8 +20,8 @@ Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomiz
 ### Key properties:
 
 - Deterministic (no randomness, always correct)
-- Predictable time complexity: O(m \cdot 4^{W_{\max}})
-- Worst-case complexity on 3-SAT phase transition: O(2^{n/2} \cdot \text{poly}(n))
+- Predictable time complexity: O(n * 4^W_max)
+- Worst-case complexity on 3-SAT phase transition: O(2^(n/2) * poly(n))
 - Built-in complexity diagnostics: estimates hardness before solving
 
 ---
@@ -30,37 +30,37 @@ Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomiz
 
 1. Variable Lifetime Tracking
 
-For each variable x, we track two events:
-
-- t_in(x) — the step when the first clause containing x is added to the BDD.
-- t_out(x) — the step when the last clause containing x is processed and x is eliminated.
-
-Between t_in and t_out, x is active — present in the current BDD context.
+    For each variable x, we track two events:
+    
+    - t_in(x) — the step when the first clause containing x is added to the BDD.
+      - t_out(x) — the step when the last clause containing x is processed and x is eliminated.
+    
+    Between t_in and t_out, x is active — present in the current BDD context.
 
 2. Context Size
 
-At any step i, the context V_i is the set of active variables:
-
-V_i = \{ x \mid t_{\text{in}}(x) \le i < t_{\text{out}}(x) \}
-
-The context width at step i:
-
-w_i = |V_i|
-
-The maximum context width over the whole run:
-
-W_{\max} = \max_i w_i
+    At any step i, the context V_i is the set of active variables:
+    
+    V_i = x : t_in(x) ≤ i < t_out(x)
+    
+    The context width at step i:
+    
+    w_i = |V_i|
+    
+    The maximum context width over the whole run:
+    
+    W_max = \max_i w_i
 
 3. Complexity Bound
 
-BDD size at step i is at most 2^{w_i}.
-Each operation (conjunction, elimination) costs O(|\text{BDD}|^2) = O(4^{w_i}).
-
-Total complexity:
-
-T(n) = O(m \cdot 4^{W_{\max}})
-
-where m is the number of clauses.
+    BDD size at step i is at most 2^w_i.
+    Each operation (conjunction, elimination) costs O(|BDD|^2) = O(4^w_i).
+    
+    Total complexity:
+    
+    T(n) = O(n * 4^W_max)
+    
+    where m is the number of clauses.
 
 ---
 
@@ -106,22 +106,22 @@ The result is in the BDD immediately after the last elimination.
 
 1. Immediate Garbage Collection
 
-Variables are eliminated as soon as they become irrelevant (no longer appear in any remaining clause).
-This keeps the BDD small and context width minimal.
+    Variables are eliminated as soon as they become irrelevant (no longer appear in any remaining clause).
+    This keeps the BDD small and context width minimal.
 
 2. No Final Blowup
 
-Because variables are eliminated continuously, the BDD never stores the entire formula at once.
-At the end, it either reduces to True, False, or a small function — but no exponential final step.
+    Because variables are eliminated continuously, the BDD never stores the entire formula at once.
+    At the end, it either reduces to True, False, or a small function — but no exponential final step.
 
 3. Phase Transition Diagnostics
 
-For random 3-SAT with clause/variable ratio ≈ 4.26, the interaction graph forces W_{\max} \approx n/2.
-Thus:
-
-T_worst = O(2^{n/2} \cdot \text{poly}(n))
-
-This is better than naive 2^n and matches the best known deterministic bounds for general CNF.
+    For random 3-SAT with clause/variable ratio ≈ 4.26, the interaction graph forces W_{\max} \approx n/2.
+    Thus:
+    
+    T_worst = O(2^{n/2} * poly(n))
+    
+    This is better than naive 2^n and matches the best known deterministic bounds for general CNF.
 
 ---
 
