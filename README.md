@@ -15,17 +15,17 @@ PQ-Algorithm is a deterministic structural SAT solver based on dynamic context e
 
 Unlike traditional SAT solvers that rely on backtracking (DPLL/CDCL) or randomization, PQ-Algorithm:
 
-· Adapts to the structure of the formula
-· Eliminates variables as soon as they become irrelevant
-· Provides predictable complexity before solving
-· Requires no final enumeration — result is in the BDD after the last clause
+- Adapts to the structure of the formula
+- Eliminates variables as soon as they become irrelevant
+- Provides predictable complexity before solving
+- Requires no final enumeration — result is in the BDD after the last clause
 
 Key properties:
 
-· Deterministic (no randomness, always correct)
-· Predictable time complexity: O(m \cdot 4^{W_{\max}})
-· Worst-case complexity on 3-SAT phase transition: O(2^{n/2} \cdot \text{poly}(n))
-· Built-in complexity diagnostics: estimates hardness before solving
+- Deterministic (no randomness, always correct)
+- Predictable time complexity: O(m \cdot 4^{W_{\max}})
+- Worst-case complexity on 3-SAT phase transition: O(2^{n/2} \cdot \text{poly}(n))
+- Built-in complexity diagnostics: estimates hardness before solving
 
 ---
 
@@ -35,8 +35,8 @@ The Core Idea
 
 For each variable x, we track two events:
 
-· t_{\text{in}}(x) — the step when the first clause containing x is added to the BDD.
-· t_{\text{out}}(x) — the step when the last clause containing x is processed and x is eliminated.
+- t_{\text{in}}(x) — the step when the first clause containing x is added to the BDD.
+- t_{\text{out}}(x) — the step when the last clause containing x is processed and x is eliminated.
 
 Between t_{\text{in}} and t_{\text{out}}, x is active — present in the current BDD context.
 
@@ -69,9 +69,9 @@ where m is the number of clauses.
 
 Why W_{\max} Matters
 
-· If W_{\max} is small (e.g., \log n), the formula is structurally easy — solved in near-polynomial time.
-· If W_{\max} \approx n/2, the formula is in the phase transition region — hardest case, but still bounded by O(2^{n/2}).
-· If W_{\max} is large (> n/2), the formula may be exponentially hard for any algorithm.
+- If W_{\max} is small (e.g., \log n), the formula is structurally easy — solved in near-polynomial time.
+- If W_{\max} \approx n/2, the formula is in the phase transition region — hardest case, but still bounded by O(2^{n/2}).
+- If W_{\max} is large (> n/2), the formula may be exponentially hard for any algorithm.
 
 Crucial: W_{\max} can be estimated before solving by analyzing the interaction graph and simulating a greedy clause order.
 
@@ -157,21 +157,21 @@ If W_{\max} \approx n/2 → problem is in the phase transition zone, expect 2^{n
 
 Strengths
 
-· ✅ Deterministic — no randomness, always correct.
-· ✅ Predictable — complexity can be estimated before solving.
-· ✅ Adaptive — fast on structured problems, bounded on hard ones.
-· ✅ Simple — only requires BDD and greedy clause selection.
-· ✅ No final blowup — result emerges naturally from elimination.
-· ✅ Provable bound — O(2^{n/2}) in the worst case (phase transition).
+- ✅ Deterministic — no randomness, always correct.
+- ✅ Predictable — complexity can be estimated before solving.
+- ✅ Adaptive — fast on structured problems, bounded on hard ones.
+- ✅ Simple — only requires BDD and greedy clause selection.
+- ✅ No final blowup — result emerges naturally from elimination.
+- ✅ Provable bound — O(2^{n/2}) in the worst case (phase transition).
 
 ---
 
 Limitations
 
-· BDD size can blow up if W_{\max} is underestimated.
-· Optimal clause order estimation is heuristic; may not always achieve minimal W_{\max}.
-· Currently analyzed for 3-CNF; longer clauses may require adjustments.
-· BDD implementation must support efficient existential quantification.
+- BDD size can blow up if W_{\max} is underestimated.
+- Optimal clause order estimation is heuristic; may not always achieve minimal W_{\max}.
+- Currently analyzed for 3-CNF; longer clauses may require adjustments.
+- BDD implementation must support efficient existential quantification.
 
 ---
 
@@ -194,11 +194,11 @@ Repository Structure (Planned)
 
 How to Contribute
 
-· Fork the repo
-· Try the algorithm on your own CNF instances
-· Suggest improvements to the clause ordering heuristic
-· Implement a faster BDD library (C++ recommended for production)
-· Report bugs and edge cases
+- Fork the repo
+- Try the algorithm on your own CNF instances
+- Suggest improvements to the clause ordering heuristic
+- Implement a faster BDD library (C++ recommended for production)
+- Report bugs and edge cases
 
 ---
 
