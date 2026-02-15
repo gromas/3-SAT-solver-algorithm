@@ -30,6 +30,18 @@ Output:
     
 The optimizer helps select the best starting variable before running 
 the full PQ-algorithm, potentially saving 15-30% of runtime.
+
+
+If you use this algorithm in your research, please cite:
+
+@misc{pq2025,
+  author = {R.S.Golubin},
+  title = {PQ-Algorithm: Structural Elimination for SAT},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/gromas/pqsat}
+}
+
 """
 
 import os
