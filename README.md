@@ -5,6 +5,11 @@
 #### License: MIT
 #### Status: Research / Proof of Concept
 
+
+> ⚠️ **Note:** This PQSAT (Pure-Quantified SAT) is **not** related to the Parametric Quantified SAT (PQSAT) used in the Redlog system.  
+> This is a structural 3-SAT solver based on variable elimination, BDDs, and core dynamics.  
+> The name comes from the **P** (core) and **Q** (remaining variables) partition.
+
 ## Overview
 
 PQ-Algorithm is a deterministic structural SAT solver based on dynamic context elimination using BDDs (Binary Decision Diagrams).
