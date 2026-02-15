@@ -1,4 +1,17 @@
-# visualize_lifetime_final.py
+# visualization/lifetime.py
+"""
+feat: lifetime.py - core dynamics visualization
+
+This tool visualizes how variables enter and exit the core during
+PQ-algorithm execution. Key features:
+- Timeline of variable activation (green dots) and elimination (red dots)
+- Core size graph showing P(t) dynamics
+- Root variable highlighting for comparison
+- Integrated complexity estimation (∑P² and ∑2^P)
+- Helps identify optimal root selection strategy
+
+Usage: python lifetime.py <cnf_file> --root <var> [--output <file>]
+"""
 
 import os
 import sys
