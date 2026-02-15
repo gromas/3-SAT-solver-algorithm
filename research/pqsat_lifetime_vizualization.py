@@ -1,6 +1,6 @@
-# visualization/pqsat_lifetime.py
+# pqsat_lifetime_vizualization.py
 """
-feat: pqsat_lifetime.py - core dynamics visualization
+feat: pqsat_lifetime_vizualization.py - core dynamics visualization
 
 This tool visualizes how variables enter and exit the core during
 PQ-algorithm execution. Key features:
@@ -10,7 +10,7 @@ PQ-algorithm execution. Key features:
 - Integrated complexity estimation (∑P² and ∑2^P)
 - Helps identify optimal root selection strategy
 
-Usage: python lifetime.py <cnf_file> --root <var> [--output <file>]
+Usage: python pqsat_lifetime_vizualization.py <cnf_file> --root <var> [--output <file>]
 
 
 If you use this algorithm in your research, please cite:
