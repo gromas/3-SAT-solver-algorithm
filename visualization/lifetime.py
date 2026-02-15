@@ -11,6 +11,18 @@ PQ-algorithm execution. Key features:
 - Helps identify optimal root selection strategy
 
 Usage: python lifetime.py <cnf_file> --root <var> [--output <file>]
+
+
+If you use this algorithm in your research, please cite:
+
+@misc{pq2025,
+  author = {R.S.Golubin},
+  title = {PQ-Algorithm: Structural Elimination for SAT},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/gromas/pqsat}
+}
+
 """
 
 import os
