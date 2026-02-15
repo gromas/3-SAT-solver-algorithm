@@ -1,6 +1,6 @@
-# visualization/lifetime.py
+# visualization/pqsat_lifetime.py
 """
-feat: lifetime.py - core dynamics visualization
+feat: pqsat_lifetime.py - core dynamics visualization
 
 This tool visualizes how variables enter and exit the core during
 PQ-algorithm execution. Key features:
