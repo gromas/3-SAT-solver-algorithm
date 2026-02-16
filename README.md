@@ -76,6 +76,20 @@ Crucial: W_max can be estimated before solving by analyzing the interaction grap
 
 ---
 
+### The Duality of P and Q
+
+A deeper analysis reveals a fundamental duality in the PQ-algorithm:
+
+- **`W_max` (context width)** is determined by the **`P` variables** (the core). It represents the **spatial complexity** — the peak memory required (size of the BDD).
+- **The number of steps** is determined by the **`Q` variables** (the complement). It represents the **temporal complexity** — the runtime of the algorithm.
+
+This leads to a powerful insight:
+> **Total Complexity = Spatial Complexity × Temporal Complexity ≈ `W_max` × (number of steps)**
+
+This product directly correlates with our integral metric `∑P(t)²` (the area under the core size curve). It explains why two formulas with the same `W_max` can have different difficulty: one might have a wider but shorter core, while the other has a narrower but longer-lived core.
+
+---
+
 ## Algorithm (Conceptual)
 
 ```
