@@ -62,6 +62,19 @@ The implementation directly references concepts from:
 
 ---
 
+## Acknowledgments
+
+The development of EBS was driven by an intensive **brainstorming collaboration** between:
+
+*   **Google AI (Gemini)** — for providing strategic insights, geometric interpretations (Hamming balls, phase transition), and helping to formalize the entropy control mechanism.
+*   **DeepSeek** — for architectural design, mathematical formalization, and code implementation guidance.
+
+This hybrid human-AI ideation process was instrumental in shaping the core concepts of Payload/Quantum duality, the `XORTeleporter`, and the adaptive beam search strategy.
+
+The final implementation represents a synthesis of these discussions, combining theoretical computer science with practical heuristic search.
+
+---
+
 ## Future Work
 
 Fully integrate the XORTeleporter with the entropy controller to automate escape from local minima.
