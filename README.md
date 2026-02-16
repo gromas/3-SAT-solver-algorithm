@@ -23,7 +23,9 @@ The names **P** and **Q** are not arbitrary:
 This duality is fundamental:
 > **Total Work = Payload × Quantum ≈ Wmax × (number of steps) ≈ ∑P(t)²**
 
-The algorithm's predictability comes from the fact that both Payload and Quantum can be estimated **before** solving.
+The algorithm's predictability comes from the fact that both Payload and Quantum can be estimated **before** solving.  
+But more importantly, they can be **optimized** by choosing the right elimination order — our experiments show up to **30% variance** in total work depending on the starting variable.  
+This "maneuver" allows us to fit the task into available resources: reduce Payload when memory is tight, or shrink Quantum when speed matters.
 
 ## Overview
 
