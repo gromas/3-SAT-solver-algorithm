@@ -10,6 +10,21 @@
 > This is a structural 3-SAT solver based on variable elimination, BDDs, and core dynamics.  
 > The name comes from the **P** (core) and **Q** (remaining variables) partition.
 
+### Terminology: Payload and Quantum
+
+The names **P** and **Q** are not arbitrary:
+
+- **P** stands for **Payload** — the spatial complexity.  
+  It represents the amount of data the algorithm must hold simultaneously (peak core size, BDD memory).
+
+- **Q** stands for **Quantum** — the temporal complexity.  
+  It represents the number of processing steps required to eliminate all variables.
+
+This duality is fundamental:
+> **Total Work = Payload × Quantum ≈ Wmax × (number of steps) ≈ ∑P(t)²**
+
+The algorithm's predictability comes from the fact that both Payload and Quantum can be estimated **before** solving.
+
 ## Overview
 
 PQ-Algorithm is a deterministic structural SAT solver based on dynamic context elimination using BDDs (Binary Decision Diagrams).
