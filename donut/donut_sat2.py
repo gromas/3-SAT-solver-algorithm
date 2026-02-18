@@ -179,15 +179,39 @@ class DonutSATVisualizer:
                     self.xor_clauses.add(idx)
     
     def build_variable_nodes(self):
-        """Построение узлов для каждой переменной"""
+        """Построение полярных узлов: Сектор H (Horn) и Сектор DH (Dual-Horn)"""
         self.var_nodes = {}
+        
+        # 1. Сначала классифицируем ВСЕ клаузы (если еще не сделано)
+        h_clauses_indices = []
+        dh_clauses_indices = []
+        
+        for idx, clause in enumerate(self.clauses):
+            pos_count = sum(1 for lit in clause if lit > 0)
+            if pos_count <= 1: # Ваше определение Horn
+                h_clauses_indices.append(idx)
+            else:              # Ваше определение Dual-Horn
+                dh_clauses_indices.append(idx)
+
+        # 2. Теперь строим бублики для каждой переменной
         for var in range(1, self.n_vars + 1):
             clauses_for_var = self.var_to_clauses.get(var, [])
             if clauses_for_var:
-                # Сортируем для стабильности
-                clauses_for_var.sort()
-                angles = np.linspace(0, 2*np.pi, len(clauses_for_var), endpoint=False)
-                self.var_nodes[var] = list(zip(clauses_for_var, angles))
+                # Фильтруем те, что относятся к H, и те, что к DH
+                var_h = [c for c in clauses_for_var if c in h_clauses_indices]
+                var_dh = [c for c in clauses_for_var if c in dh_clauses_indices]
+                
+                # Собираем: Сначала сектор "Отрицательного давления", затем "Положительного"
+                ordered_clauses = var_h + var_dh
+                
+                angles = np.linspace(0, 2*np.pi, len(ordered_clauses), endpoint=False)
+                self.var_nodes[var] = list(zip(ordered_clauses, angles))
+                
+                n_clauses = len(self.var_to_clauses.get(var, []))
+                # Нелинейная инерция: чем больше клауз, тем МЕНЬШЕ скорость реакции
+                # Для 3 клауз: инерция ~ 0.5 (быстрая)
+                # Для 15 клауз: инерция ~ 0.02 (очень тяжелая)
+                self.gear_inertia[var] = 1.0 / (1.0 + np.power(n_clauses, 1.5)) 
     
     def setup_visualization(self):
         """Настройка визуализации"""
@@ -284,6 +308,18 @@ class DonutSATVisualizer:
         
         # Обновление фаз с учетом ускорений
         for var in range(1, self.n_vars + 1):
+        
+            """
+            # Принудительная блокировка шестеренки
+            if var == 3:
+                #self.var_phases_velocity[var] = 0.0  # Скорость ноль
+                #self.var_phases[var] = 0.0           # Фаза стоит на месте
+                #self.jitter_radius[var] = 1.0        # Радиус не дрожит
+                #self.var_values[var] = 0.0           # Логическое значение нейтрально
+                self.gear_inertia[var] = 0.01
+                continue                             # Пропускаем остальные расчеты для этой переменной
+            """
+        
             # Базовое вращение
             base_speed = 0.1
             
