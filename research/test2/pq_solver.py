@@ -141,11 +141,13 @@ class PQBDDSolver:
         print("="*70)
         
         step2_count = 0
-        # Перебираем BDD в обратном порядке создания (с последней созданной)
+       
         for i in range(len(self.variables) - 1, -1, -1):
             var_i = self.variables[i]
             var_name = f'x{var_i.var_id}'
+            bdd_i = self.variables[i].bdd
             #var_i.bdd = self.bdd_manager.exist([var_name], var_i.bdd)  # ∃x_i. BDD_i
+            combined = bdd_i
             
             # Перебираем все BDD с меньшим индексом переменной
             for j in range(i):
@@ -163,32 +165,37 @@ class PQBDDSolver:
                 
                 print(f"   До композиции:")
                 print(f"     BDD_{var_j.var_id}: {size_j_in} узлов")
-                
+
                 # Выполняем композицию: var_j.bdd = compose(var_j.bdd, xi, var_i.bdd)
+                bdd_j = self.variables[j].bdd
+                if var_name in bdd_j.support:
+                    combined &= bdd_j
                 # Используем let вместо compose
-                var_j.bdd = self.bdd_manager.let({var_name: var_i.bdd}, var_j.bdd)
+                #var_j.bdd = self.bdd_manager.let({var_name: var_i.bdd}, var_j.bdd)
                 #var_j.bdd = self.bdd_manager.exist([var_name], var_j.bdd)  # ∃x_i. BDD_i
 
-                if var_j.bdd == self.bdd_manager.false:
-                    print(f"❌ Обнаружено противоречие при композиции x{var_j.var_id} и x{var_i.var_id}")
-                    return False  # UNSAT
                 
                 # Обновляем клозы в var_j (теперь они включают клозы из var_i)
                 #var_j.clauses.extend(var_i.clauses)
 
                 # Статистика после композиции
                 #clauses_j_out = len(var_j.clauses)
-                size_j_out = len(self.bdd_manager)
+                #size_j_out = len(self.bdd_manager)
                 # Если размер резко вырос, возможно, это из-за сложных ограничений
-                if size_j_out > size_j_in * 10:
-                    print(f"⚠️  Резкий рост размера: {size_j_in} → {size_j_out}")                    
+                #if size_j_out > size_j_in * 10:
+                #    print(f"⚠️  Резкий рост размера: {size_j_in} → {size_j_out}")                    
 
-                step_time = time.time() - start_step
-                self.stats['step2_times'].append(step_time)
+                #step_time = time.time() - start_step
+                #self.stats['step2_times'].append(step_time)
                 
-                print(f"   После композиции:")
-                print(f"     BDD_{var_j.var_id}: {size_j_out} узлов")
-                print(f"   ⏱️  Время: {step_time:.3f} сек")
+                #print(f"   После композиции:")
+                #print(f"     BDD_{var_j.var_id}: {size_j_out} узлов")
+                #print(f"   ⏱️  Время: {step_time:.3f} сек")
+
+            self.variables[j].bdd = combined.exist(var_name)
+            if var_j.bdd == self.bdd_manager.false:
+                print(f"❌ Обнаружено противоречие при композиции x{var_j.var_id} и x{var_i.var_id}")
+                return False  # UNSAT
         
         print(f"\n✅ Шаг 2 завершён. Выполнено {step2_count} композиций")
         
