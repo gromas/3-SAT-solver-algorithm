@@ -5,10 +5,16 @@
 #### License: MIT
 #### Status: Research / Proof of Concept
 
+# PQ-Algorithm: Structural Elimination for SAT
 
-> ⚠️ **Note:** This PQSAT (Pure-Quantified SAT) is **not** related to the Parametric Quantified SAT (PQSAT) used in the Redlog system.  
-> This is a structural 3-SAT solver based on variable elimination, BDDs, and core dynamics.  
-> The name comes from the **P** (core) and **Q** (remaining variables) partition.
+A deterministic SAT solver that **adapts to the formula's structure**, eliminating variables as they become irrelevant. Instead of brute-force enumeration or backtracking, it compiles the problem into a Binary Decision Diagram (BDD) by continuously shrinking the active context.
+
+**The core idea is simple:**
+- Track which variables are still "alive" (present in remaining clauses).
+- Eliminate a variable as soon as it dies (∃-quantification in the BDD).
+- The result emerges naturally from the last clause—no final enumeration step.
+
+> ⚠️ **Note on the name:** This PQSAT (Pure-Quantified SAT) is **not** related to the Parametric Quantified SAT (PQSAT) used in the Redlog system. The name comes from our **P** (core) and **Q** (remaining variables) partition, described below.
 
 ## Main Conclusion of the Study
 
