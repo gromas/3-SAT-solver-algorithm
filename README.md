@@ -1,7 +1,7 @@
 # pqsat algorithm
 ### Structural Elimination for SAT
 
-#### Author: [R.S.Golubin / gromas]
+#### Author: [Golubin Roman / gromas]
 #### License: MIT
 #### Status: Research / Proof of Concept
 
@@ -211,14 +211,14 @@ Repository Structure (Planned)
 ```
 /
 ├── README.md              # This file
-├── paper/                 # Theoretical description (PDF/LaTeX)
-├── src/                   # Implementation (future)
-│   ├── bdd.py             # Simple BDD implementation with ∃
-│   ├── pq_algorithm.py    # Main solver
-│   ├── estimator.py       # Pre-solver complexity estimation
-│   └── utils.py           # Graph utilities
-├── benchmarks/            # CNF test instances
-└── results/               # Experimental data
+├── theory/                # Theoretical description
+│   ├── pq-split.md        # root of theory of pq-alghoritm
+│   ├── pq-to-bdd.md       # symbolic elimination description
+│   research/              # some files for test theory
+│   ├── test2              # symbolic elimination implementation with python
+#####
+all other files in progress.
+#####
 ```
 
 ---
@@ -248,7 +248,7 @@ If you use this algorithm in your research, please cite:
 
 ```
 @misc{pq2025,
-  author = {R.S.Golubin},
+  author = {Golubin Roman},
   title = {PQ-Algorithm: Structural Elimination for SAT},
   year = {2026},
   publisher = {GitHub},
