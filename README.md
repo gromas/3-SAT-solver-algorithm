@@ -10,6 +10,15 @@
 > This is a structural 3-SAT solver based on variable elimination, BDDs, and core dynamics.  
 > The name comes from the **P** (core) and **Q** (remaining variables) partition.
 
+## Main Conclusion of the Study
+
+The complexity of solving the satisfiability problem for a given 3-CNF formula is not a fixed function of the number of variables n.
+It is determined by the structural properties of the specific formula and can vary widely: from O(1) for formulas that reduce to a contradiction already at the cofactor construction stage to O(2^(n/2⋅poly⁡(n)) in the worst case, when the variable interaction graph does not allow effective compression.
+
+At the same time, the complexity remains polynomial with respect to n for a fixed size of the vertex cover or independent set.
+
+Thus, the PQ-algorithm adapts to the structure of the formula, choosing the optimal strategy depending on the P and Q ratio, and is guaranteed not to exceed an exponential with a reduced base.
+
 ### Terminology: Payload and Quantum
 
 The names **P** and **Q** are not arbitrary:
