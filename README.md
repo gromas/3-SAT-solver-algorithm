@@ -27,16 +27,17 @@ Thus, the PQ-algorithm adapts to the structure of the formula, choosing the opti
 
 ### Terminology: Payload and Quantum
 
-The names **P** and **Q** are not arbitrary:
+The names **P** and **Q** reflect a fundamental duality in the algorithm's complexity:
 
-- **P** stands for **Payload** — the spatial complexity.  
-  It represents the amount of data the algorithm must hold simultaneously (peak core size, BDD memory).
+* **P** stands for **Payload** — the **spatial complexity**.  
+  It's the set of variables simultaneously alive. Its size (`|P| = W_max`) determines the peak memory (BDD nodes).  
+  *Think of it as the **width** of the problem.*
 
-- **Q** stands for **Quantum** — the temporal complexity.  
-  It represents the number of processing steps required to eliminate all variables.
+* **Q** stands for **Quantum** — the **temporal complexity**.  
+  It's the set of variables already eliminated. The number of steps needed to process them determines the runtime.  
+  *Think of it as the **length** of the computation.*
 
-This duality is fundamental:
-> **Total Work = Payload × Quantum ≈ Wmax × (number of steps) ≈ ∑P(t)²**
+> **Total Work ≈ Payload × Quantum ≈ W_max × (number of steps) ≈ ∑|P(t)|²**
 
 The algorithm's predictability comes from the fact that both Payload and Quantum can be estimated **before** solving.  
 But more importantly, they can be **optimized** by choosing the right elimination order — our experiments show up to **30% variance** in total work depending on the starting variable.  
