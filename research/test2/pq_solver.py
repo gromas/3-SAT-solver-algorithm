@@ -74,6 +74,47 @@ class PQBDDSolver:
             var_clauses[min_var].append(clause)
         
         return var_clauses
+        
+    def find_unique_support_variables(self, current_idx: int) -> List[int]:
+        """
+        Находит переменные, которые есть в поддержке BDD с индексом current_idx,
+        но отсутствуют во всех остальных активных BDD.
+        
+        Возвращает список переменных (их ID) для возможной элиминации.
+        """
+        if current_idx >= len(self.variables):
+            return []
+        
+        current_bdd = self.variables[current_idx].bdd
+        if current_bdd == self.bdd_manager.true:
+            return []  # Зануленный BDD не рассматриваем
+        
+        # Получаем поддержку текущего BDD
+        current_support = set(current_bdd.support)
+        if not current_support:
+            return []  # Нет переменных — ничего не делаем
+        
+        # Собираем поддержки всех остальных активных BDD
+        other_supports = set()
+        for idx, var_bdd in enumerate(self.variables):
+            if idx == current_idx or var_bdd.bdd == self.bdd_manager.true:
+                continue
+            other_supports.update(var_bdd.bdd.support)
+        
+        # Находим переменные, которые есть только в текущем BDD
+        unique_vars = current_support - other_supports
+        
+        # Преобразуем имена переменных в числовые ID
+        result = []
+        for var_name in unique_vars:
+            if var_name.startswith('x'):
+                try:
+                    var_id = int(var_name[1:])
+                    result.append(var_id)
+                except ValueError:
+                    continue
+        
+        return result        
 
     def solve(self, filename: str) -> Tuple[bool, Dict]:
         """
@@ -141,6 +182,8 @@ class PQBDDSolver:
         step2_count = 0
        
         for i in range(len(self.variables) - 1, -1, -1):
+            if self.variables[i].bdd == self.bdd_manager.true:
+                continue
             var_i = self.variables[i]
             var_name = f'x{var_i.var_id}'
             bdd_i = self.variables[i].bdd
@@ -177,6 +220,20 @@ class PQBDDSolver:
             start_step = time.time()
             # Считаем целевую bdd и помещаем её в последний обработанный j
             self.variables[min_j].bdd = combined.exist(var_name)
+            
+            print(f"\n📌 Шаг 2.{step2_count}: Проверка уникальности переменных")
+            # Анализируем уникальные переменные
+            unique = self.find_unique_support_variables(min_j)
+            if unique:
+                print(f"   🎯 Уникальные переменные в x{self.variables[min_j].var_id}: {unique}")
+                # Здесь можно сразу их элиминировать или просто вывести            
+                
+                for var_id in unique:
+                    var_name = f'x{var_id}'
+                    self.variables[min_j].bdd = self.variables[min_j].bdd.exist(var_name)
+                    print(f"      ✅ Автоматически элиминирована x{var_id}")
+                
+            
             if self.variables[min_j].bdd == self.bdd_manager.false:
                 is_sat = False
 
