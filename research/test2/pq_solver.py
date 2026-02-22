@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import gc
 from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
@@ -204,10 +205,10 @@ class PQBDDSolver:
                     print(f"\n📌 Шаг 2.{step2_count}: Композиция x{var_j.var_id} := compose(x{var_i.var_id})")
                     
                     # Статистика до композиции
-                    size_j_in = len(self.bdd_manager)
+                    bdd_len = len(self.bdd_manager)
                     
                     print(f"   До композиции:")
-                    print(f"     BDD_{var_j.var_id}: {size_j_in} узлов")
+                    print(f"   BDD: {bdd_len} узлов")
 
                     combined &= bdd_j
                     self.variables[j].bdd = self.bdd_manager.true
@@ -219,7 +220,11 @@ class PQBDDSolver:
 
             start_step = time.time()
             # Считаем целевую bdd и помещаем её в последний обработанный j
-            self.variables[min_j].bdd = combined.exist(var_name)
+            combined = combined.exist(var_name)
+
+            bdd_len = len(self.bdd_manager)
+            print(f"   После композиции:")
+            print(f"   BDD: {bdd_len} узлов")
             
             print(f"\n📌 Шаг 2.{step2_count}: Проверка уникальности переменных")
             # Анализируем уникальные переменные
@@ -230,13 +235,19 @@ class PQBDDSolver:
                 
                 for var_id in unique:
                     var_name = f'x{var_id}'
-                    self.variables[min_j].bdd = self.variables[min_j].bdd.exist(var_name)
+                    combined = combined.exist(var_name)
                     print(f"      ✅ Автоматически элиминирована x{var_id}")
                 
-            
+                bdd_len = len(self.bdd_manager)
+                print(f"   После элиминации:")
+                print(f"   BDD: {bdd_len} узлов")
+
             if self.variables[min_j].bdd == self.bdd_manager.false:
                 is_sat = False
-
+    
+            self.variables[min_j].bdd = combined
+            combined = self.bdd_manager.false
+                
             step_time = time.time() - start_step
             self.stats['step2_times'].append(step_time)
         
