@@ -146,8 +146,7 @@ class PQBDDSolver:
             bdd_i = self.variables[i].bdd
             self.variables[i].bdd = self.bdd_manager.true
             combined = bdd_i
-            processed = False
-            
+            min_j = i
             # Перебираем все BDD с меньшим индексом переменной
             for j in reversed(range(i)):
                 var_j = self.variables[j]
@@ -155,7 +154,7 @@ class PQBDDSolver:
                 # Выполняем композицию: var_j.bdd = compose(var_j.bdd, xi, var_i.bdd)
                 bdd_j = self.variables[j].bdd
                 if var_name in bdd_j.support:
-
+                    min_j = j
                     start_step = time.time()
                     step2_count += 1
                     
@@ -175,15 +174,14 @@ class PQBDDSolver:
                     
                     processed = True
 
-            if processed:
-                start_step = time.time()
-                # Считаем целевую bdd
-                self.variables[j].bdd = combined.exist(var_name)
-                if var_j.bdd == self.bdd_manager.false:
-                    is_sat = False
+            start_step = time.time()
+            # Считаем целевую bdd и помещаем её в последний обработанный j
+            self.variables[min_j].bdd = combined.exist(var_name)
+            if self.variables[min_j].bdd == self.bdd_manager.false:
+                is_sat = False
 
-                step_time = time.time() - start_step
-                self.stats['step2_times'].append(step_time)
+            step_time = time.time() - start_step
+            self.stats['step2_times'].append(step_time)
         
         print(f"\n✅ Шаг 2 завершён. Выполнено {step2_count} композиций")
         
