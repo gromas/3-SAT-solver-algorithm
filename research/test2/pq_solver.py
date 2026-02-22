@@ -42,11 +42,9 @@ class PQBDDSolver:
         Создаёт BDD для конкретной переменной, учитывая все клозы с её литералами.
         Порядок переменных: от n до 1 (убывающий)
         """
-        # Создаём BDD для конъюнкции клозов, содержащих эту переменную
         bdd = self.bdd_manager.true
         
         for clause in clauses:
-            # Создаём BDD для дизъюнкта
             clause_bdd = self.bdd_manager.false
             for lit in clause:
                 var_name = f'x{abs(lit)}'
@@ -56,7 +54,6 @@ class PQBDDSolver:
                     lit_bdd = ~self.bdd_manager.var(var_name)
                 clause_bdd = clause_bdd | lit_bdd
             
-            # Конъюнкция всех клозов
             bdd = bdd & clause_bdd
         
         return bdd
@@ -66,46 +63,41 @@ class PQBDDSolver:
         Разделяет клозы по переменным.
         Каждый клоз попадает только в одну группу - к переменной с минимальным индексом.
         """
-        # Сортируем клозы по минимальному индексу переменной в них
-        var_clauses = [[] for _ in range(self.n_vars + 1)]  # 1-based индексация
+        var_clauses = [[] for _ in range(self.n_vars + 1)]
         
         for clause in self.original_clauses:
-            # Находим минимальную переменную в клозе
             min_var = min(abs(lit) for lit in clause)
             var_clauses[min_var].append(clause)
         
         return var_clauses
         
-    def find_unique_support_variables(self, current_idx: int) -> List[int]:
+    def find_unique_support_variables(self, combined, current_idx: int) -> List[int]:
         """
         Находит переменные, которые есть в поддержке BDD с индексом current_idx,
         но отсутствуют во всех остальных активных BDD.
         
         Возвращает список переменных (их ID) для возможной элиминации.
         """
-        if current_idx >= len(self.variables):
+        
+        #if current_idx >= len(self.variables):
+        #    return []
+        
+        #current_bdd = self.variables[current_idx].bdd
+        #if current_bdd == self.bdd_manager.true:
+        #    return []
+        
+        current_support = set(combined.support)
+        if not current_support:
             return []
         
-        current_bdd = self.variables[current_idx].bdd
-        if current_bdd == self.bdd_manager.true:
-            return []  # Зануленный BDD не рассматриваем
-        
-        # Получаем поддержку текущего BDD
-        current_support = set(current_bdd.support)
-        if not current_support:
-            return []  # Нет переменных — ничего не делаем
-        
-        # Собираем поддержки всех остальных активных BDD
         other_supports = set()
         for idx, var_bdd in enumerate(self.variables):
             if idx == current_idx or var_bdd.bdd == self.bdd_manager.true:
                 continue
             other_supports.update(var_bdd.bdd.support)
         
-        # Находим переменные, которые есть только в текущем BDD
         unique_vars = current_support - other_supports
         
-        # Преобразуем имена переменных в числовые ID
         result = []
         for var_name in unique_vars:
             if var_name.startswith('x'):
@@ -130,23 +122,19 @@ class PQBDDSolver:
         print("🔧 ШАГ 1: Инициализация и построение BDD для переменных")
         print("="*70)
         
-        # Парсим CNF файл
         self.n_vars, self.original_clauses = parse_dimacs_cnf(filename)
         print(f"\n📊 Исходная функция F:")
         print(f"   Переменных: {self.n_vars}")
         print(f"   Клозов: {len(self.original_clauses)}")
         print(f"   Плотность: {len(self.original_clauses)/self.n_vars:.2f}")
         
-        # Инициализируем BDD менеджер с порядком переменных от n до 1
         var_order = {f'x{i}': i for i in range(self.n_vars, 0, -1)}
         self.bdd_manager = _bdd.BDD()
         for i in range(self.n_vars, 0, -1):
             self.bdd_manager.declare(f'x{i}')
         
-        # Разделяем клозы по переменным
         var_clauses = self._split_clauses_by_variable()
         
-        # Строим BDD для каждой переменной
         for var_id in range(1, self.n_vars + 1):
             if not var_clauses[var_id]:
                 print(f"\n⚠️  Переменная x{var_id} не имеет клозов - пропускаем")
@@ -157,12 +145,11 @@ class PQBDDSolver:
             print(f"\n📌 Шаг 1.{var_id}: Обработка переменной x{var_id}")
             print(f"   Клозов с этой переменной: {len(var_clauses[var_id])}")
             
-            # Создаём BDD для этой переменной
             bdd = self._create_bdd_for_variable(var_id, var_clauses[var_id])
 
             if bdd == self.bdd_manager.false:
                 print(f"❌ Обнаружено противоречие при построении x{var_id}")
-                return False  # UNSAT
+                return False
             node_count = len(self.bdd_manager)
             
             self.variables.append(VariableBDD(var_id, bdd, var_clauses[var_id]))
@@ -175,9 +162,9 @@ class PQBDDSolver:
         
         print(f"\n✅ Шаг 1 завершён. Построено BDD для {len(self.variables)} переменных")
         
-        # Шаг 2: Композиция BDD
+        # Шаг 2: Композиция BDD (НОВАЯ ОПТИМИЗИРОВАННАЯ ВЕРСИЯ)
         print("\n" + "="*70)
-        print("🔄 ШАГ 2: Композиция BDD")
+        print("🔄 ШАГ 2: Композиция BDD (с промежуточной оптимизацией)")
         print("="*70)
         
         step2_count = 0
@@ -185,68 +172,63 @@ class PQBDDSolver:
         for i in range(len(self.variables) - 1, -1, -1):
             if self.variables[i].bdd == self.bdd_manager.true:
                 continue
+                
             var_i = self.variables[i]
             var_name = f'x{var_i.var_id}'
-            bdd_i = self.variables[i].bdd
+            
+            # Текущий накапливаемый BDD
+            current = self.variables[i].bdd
             self.variables[i].bdd = self.bdd_manager.true
-            combined = bdd_i
             min_j = i
-            # Перебираем все BDD с меньшим индексом переменной
+            
+            # Перебираем все BDD с меньшим индексом
             for j in reversed(range(i)):
-                var_j = self.variables[j]
-
-                # Выполняем композицию: var_j.bdd = compose(var_j.bdd, xi, var_i.bdd)
-                bdd_j = self.variables[j].bdd
-                if var_name in bdd_j.support:
+                if self.variables[j].bdd == self.bdd_manager.true:
+                    continue
+                    
+                if var_name in self.variables[j].bdd.support:
                     min_j = j
                     start_step = time.time()
                     step2_count += 1
                     
-                    print(f"\n📌 Шаг 2.{step2_count}: Композиция x{var_j.var_id} := compose(x{var_i.var_id})")
+                    print(f"\n📌 Шаг 2.{step2_count}: Композиция x{self.variables[j].var_id} := compose(x{var_i.var_id})")
+                    print(f"   До композиции: {len(self.bdd_manager)} узлов")
                     
-                    # Статистика до композиции
-                    bdd_len = len(self.bdd_manager)
-                    
-                    print(f"   До композиции:")
-                    print(f"   BDD: {bdd_len} узлов")
-
-                    combined &= bdd_j
+                    # 1. Объединяем с текущим BDD
+                    current = current & self.variables[j].bdd
                     self.variables[j].bdd = self.bdd_manager.true
+                    
+                    # 2. ПРОМЕЖУТОЧНАЯ ОПТИМИЗАЦИЯ: элиминируем уникальные переменные
+                    unique = self.find_unique_support_variables(current, min_j)
+                    if unique:
+                        print(f"   🎯 Промежуточные уникальные в x{self.variables[min_j].var_id}: {unique}")
+                        for var_id in unique:
+                            var_name_unique = f'x{var_id}'
+                            current = current.exist(var_name_unique)
+                            print(f"      ✅ Элиминирована x{var_id}")
+                    
+                    print(f"   После: {len(self.bdd_manager)} узлов")
                     
                     step_time = time.time() - start_step
                     self.stats['step2_times'].append(step_time)
-                    
-                    processed = True
-
-            start_step = time.time()
-            # Считаем целевую bdd и помещаем её в последний обработанный j
-            combined = combined.exist(var_name)
-
-            bdd_len = len(self.bdd_manager)
-            print(f"   После композиции:")
-            print(f"   BDD: {bdd_len} узлов")
             
-            print(f"\n📌 Шаг 2.{step2_count}: Проверка уникальности переменных")
-            # Анализируем уникальные переменные
-            unique = self.find_unique_support_variables(min_j)
+            # Финальная элиминация xi
+            start_step = time.time()
+            current = current.exist(var_name)
+            
+            # Финальная оптимизация
+            unique = self.find_unique_support_variables(current, min_j)
             if unique:
-                print(f"   🎯 Уникальные переменные в x{self.variables[min_j].var_id}: {unique}")
-                # Здесь можно сразу их элиминировать или просто вывести            
-                
+                print(f"\n📌 Финальные уникальные в x{self.variables[min_j].var_id}: {unique}")
                 for var_id in unique:
-                    var_name = f'x{var_id}'
-                    combined = combined.exist(var_name)
-                    print(f"      ✅ Автоматически элиминирована x{var_id}")
-                
-                bdd_len = len(self.bdd_manager)
-                print(f"   После элиминации:")
-                print(f"   BDD: {bdd_len} узлов")
-
-            if self.variables[min_j].bdd == self.bdd_manager.false:
+                    var_name_unique = f'x{var_id}'
+                    current = current.exist(var_name_unique)
+                    print(f"   ✅ Элиминирована x{var_id}")
+            
+            self.variables[min_j].bdd = current
+            
+            if current == self.bdd_manager.false:
                 is_sat = False
-    
-            self.variables[min_j].bdd = combined
-            combined = self.bdd_manager.false
                 
             step_time = time.time() - start_step
             self.stats['step2_times'].append(step_time)
@@ -258,34 +240,27 @@ class PQBDDSolver:
         print("🔍 ШАГ 3: Проверка выполнимости")
         print("="*70)
 
-        # Берём BDD с наименьшей переменной
         if is_sat:
-            final_bdd = self.variables[0].bdd  # Первый в списке - с наименьшей переменной
+            final_bdd = self.variables[0].bdd
             self.stats['final_bdd_size'] = len(self.bdd_manager)
             
             print(f"\n📊 Финальный BDD (переменная x{self.variables[0].var_id}):")
             print(f"   Размер менеджера: {self.stats['final_bdd_size']} узлов")
             
-            # ✅ ПРАВИЛЬНО: используем pick_iter для проверки выполнимости
-            # pick_iter возвращает итератор по выполняющим наборам
             model_iterator = self.bdd_manager.pick_iter(final_bdd)
             
             try:
-                # Пытаемся получить первую модель
                 first_model = next(model_iterator)
                 is_sat = True
                 result = "SAT"
                 
                 print(f"\n🎯 Результат: {result}")
-                
-                # Показываем модель
                 print(f"\n📝 Пример выполняющего набора:")
                 for var, val in sorted(first_model.items()):
-                    if var.startswith('x'):  # Только переменные из формулы
+                    if var.startswith('x'):
                         print(f"   {var} = {val}")
                         
             except StopIteration:
-                # Нет ни одной модели - формула невыполнима
                 is_sat = False
                 result = "UNSAT"
                 print(f"\n🎯 Результат: {result}")
@@ -295,7 +270,6 @@ class PQBDDSolver:
             is_sat = False
             result = "UNSAT (пустая формула?)"
         
-        # Общая статистика
         self.stats['total_time'] = time.time() - start_total
         
         print("\n" + "="*70)
@@ -305,7 +279,10 @@ class PQBDDSolver:
         print(f"📊 Время по шагам:")
         print(f"   Шаг 1 (построение): {sum(self.stats['step1_times']):.3f} сек")
         print(f"   Шаг 2 (композиция): {sum(self.stats['step2_times']):.3f} сек")
-        print(f"   Среднее время композиции: {sum(self.stats['step2_times'])/len(self.stats['step2_times']):.3f} сек" if self.stats['step2_times'] else "   Нет композиций")
+        if self.stats['step2_times']:
+            print(f"   Среднее время композиции: {sum(self.stats['step2_times'])/len(self.stats['step2_times']):.3f} сек")
+        else:
+            print("   Нет композиций")
         print(f"📦 Финальный размер BDD: {self.stats['final_bdd_size']} узлов")
         print(f"🎯 Результат: {result}")
         
@@ -330,7 +307,6 @@ def main():
     print("="*70)
     print(f"Файл: {filename}")
     
-    # Создаём и запускаем солвер
     solver = PQBDDSolver()
     try:
         result, stats = solver.solve(filename)
